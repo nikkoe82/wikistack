@@ -1,25 +1,45 @@
 const Sequelize = require('sequelize');
-const db = new Sequelize('postgres://localhost:5432/wikistack');
+const db = new Sequelize('postgres://localhost:5432/wikistack', { logging: false });
 
 const Page = db.define('page', {
-    title: Sequelize.STRING,
-    slug: {
-        type: Sequelize.STRING,
-        unique: true
-    },
-    content: Sequelize.STRING,
-    status: Sequelize.STRING
+  title: {
+    type: Sequelize.STRING,
+    allowNull: false
+  },
+  slug: {
+    type: Sequelize.STRING,
+    unique: true,
+    allowNull: false
+  },
+  content: {
+    type: Sequelize.TEXT,
+    allowNull: false
+
+  },
+  status: Sequelize.ENUM('open', 'close')
 });
 
 const User = db.define('user', {
-    name: {
-        type: Sequelize.STRING,
-        allowNull: false
-    },
-    email: Sequelize.STRING
+  name: {
+    type: Sequelize.STRING,
+    allowNull: false
+  },
+  email: {
+    type: Sequelize.STRING,
+    //defaultValue: set type to this if it's not included in User.create()
+    allowNull: false,
+    validate: {
+      isEmail: true
+    }
+  }
 
+})
+Page.beforeValidate((userInstance, optionsObject) => {
+  userInstance.slug = userInstance.slug.replace(/\s+/g, '_').replace(/\W/g, '')
 })
 
 module.exports = {
-  db
+  db,
+  Page,
+  User
 }
