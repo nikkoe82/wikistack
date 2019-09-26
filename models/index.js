@@ -35,8 +35,10 @@ const User = db.define('user', {
 
 })
 Page.beforeValidate((userInstance, optionsObject) => {
-  userInstance.slug = userInstance.slug.replace(/\s+/g, '_').replace(/\W/g, '')
+  userInstance.slug = userInstance.title.replace(/\s+/g, '_').replace(/\W/g, '')
 })
+
+Page.belongsTo(User, { as: 'author' });
 
 module.exports = {
   db,
